@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util-4.0.xsd 
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<!--
+	   - Datasource using Oracle Universal Connection Pool 
+	 -->
+	<bean id="dataSource" class="oracle.ucp.jdbc.PoolDataSourceFactory"
+		factory-method="getPoolDataSource">
+		<property name="URL" value="jdbc:oracle:thin:@192.168.56.102:1521:xe" />
+		<property name="user" value="custpref" />
+		<property name="password" value="password" />
+		<property name="connectionFactoryClassName" value="oracle.jdbc.pool.OracleDataSource" />
+		<property name="connectionPoolName" value="TEST_POOL" />
+		<property name="minPoolSize" value="3" />
+		<property name="maxPoolSize" value="10" />
+		<property name="initialPoolSize" value="1" />
+		<property name="validateConnectionOnBorrow" value="true" />
+		<property name="SQLForValidateConnection" value="SELECT 1 FROM dual"/>
+	</bean>
+	
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="quartzScheduler"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="schedulerName" value="test" />
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:quartz.properties" />
+	</bean>
+</beans>
+ 
